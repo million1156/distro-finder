@@ -17,7 +17,7 @@ This can also be used in the industrial/shipping space, where manufactures are a
 First, replace the bot token at the bottom of the `main.py` file!
 
 Then, replace the ReCaptcha token
-> [!INFO]
+> [!NOTE]
 > Unfortunately, I cannot find an efficient way to automatically make a ReCaptcha token, so you have to manually go to [GS1's website](https://www.gs1.org/services/verified-by-gs1/) and complete the captcha, then press `Ctrl+Shift+I` (or `Option + Command + I` on macOS), go to "Network", then click on the `results` on the left side. Scroll down until you see "captcha_token", then replace the "captcha_token" in the `main.py` script to the one you just got.
 
 
