@@ -1,20 +1,22 @@
 from interactions import Client, Intents, listen, slash_command, SlashContext, OptionType, slash_option, SlashCommandChoice, Embed
 import requests
-from datetime import datetime, timedelta
-import asyncio
-from bs4 import BeautifulSoup
 import re
-import random
-import websockets
 import json
 
 bot = Client(intents=Intents.ALL)
+
+# Configurations
+RECAPTCHA_TOKEN = "RECAPTCHA_TOKEN"
+BOT_TOKEN = "DISCORD_BOT_TOKEN"
+ERROR_EMOTE = "<:error:1208885864424407141>"
+SUCCESS_EMOTE = "<:success:1208885438010359869>"
+
 
 @slash_command(name="upccheck", description="Checks which company a UPC was created by")
 @slash_option(name="upc", description="UPC to use", required=True, opt_type=OptionType.STRING)
 async def scrapelink(ctx: SlashContext, upc: str):
     await ctx.defer()
-    testLink = f"https://www.gs1.org/services/verified-by-gs1/results?gtin={upc}&ajax_form=1&_wrapper_format=html&_wrapper_format=drupal_ajax"
+    apiURL = f"https://www.gs1.org/services/verified-by-gs1/results?gtin={upc}&ajax_form=1&_wrapper_format=html&_wrapper_format=drupal_ajax"
     
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -46,7 +48,7 @@ async def scrapelink(ctx: SlashContext, upc: str):
         "other_key": "",
         "vfs_token": "7RGv329hHAf2-iKrxIbl0NWsyNvTOpihVanqb-crGpU",
         "captcha_sid": "2627596",
-        "captcha_token": "RECAPTCHA_TOKEN",
+        "captcha_token": RECAPTCHA_TOKEN,
         "form_build_id": "form-W274pwIIm6tOi02zJN7jFlgpVKDO4PTSB6u0SJnLQeQ",
         "form_id": "verified_search_form",
         "_triggering_element_name": "gtin_submit",
@@ -56,27 +58,26 @@ async def scrapelink(ctx: SlashContext, upc: str):
         "ajax_page_state[theme_token]": "",
         "ajax_page_state[libraries]": "addtoany/addtoany,back_to_top/back_to_top_icon,back_to_top/back_to_top_js,bootstrap_barrio/bootstrap-icons,bootstrap_barrio/global-styling,bootstrap_barrio/messages_white,bootstrap_barrio/node,bootstrap_styles/plugin.background_color.build,bootstrap_styles/plugin.margin.build,bootstrap_styles/plugin.padding.build,bootstrap_styles/plugin.scroll_effects.build,captcha/base,ckeditor_bootstrap_tabs/tabs,core/drupal.states,core/internal.jquery.form,core/jquery.form,fontawesome/fontawesome.svg,fontawesome/fontawesome.svg.shim,gsone_revamp/bootstrap_cdn,gsone_revamp/global-styling,gsone_revamp/select,gsone_revamp/select-library,gsone_verified_search/rateit,gsone_verified_search/verified_search,recaptcha_once/recaptcha_once,system/base,views/views.module,webform/libraries.jquery.intl-tel-input"
     }
-    response = requests.post(testLink, headers=headers, data=data)
+    response = requests.post(apiURL, headers=headers, data=data)
 
     try:
      res = json.loads(response.content)
-     print(res)
      company = res[4]["settings"]["gsone_verified_search"]["statusMessage"]
      company = company.replace("Currently, no product information has been provided for this product.", "")
      company = company.replace("This number is registered to company: ", "")
     except:
-        return "Error"
+        return company = "Error"
     if company == "Error":
         embed = Embed(
             title="Error",
-            description=f"<:error:1208885864424407141> There was an error scraping the link. Please try again later :(",
+            description=f"{ERROR_EMOTE} There was an error grabbing the UPC data. Please try again later :(",
             color=0xFF0000
         )
         await ctx.send(embed=embed)
         return
     embed = Embed(
         title="Success!",
-        description=f"<:success:1208885438010359869> Here's your distributor/manufacturer :) {company}",
+        description=f"{SUCCESS_EMOTE} Here's your distributor/manufacturer :) {company}",
         color=0x00FF00
     )
     await ctx.send(embed=embed)
@@ -85,4 +86,4 @@ async def scrapelink(ctx: SlashContext, upc: str):
 
 
 
-bot.start("TOKEN")
+bot.start(BOT_TOKEN)
