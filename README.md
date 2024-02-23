@@ -20,6 +20,11 @@ Then, replace the ReCaptcha token
 > [!NOTE]
 > Unfortunately, I cannot find an efficient way to automatically make a ReCaptcha token, so you have to manually go to [GS1's website](https://www.gs1.org/services/verified-by-gs1/) and complete the captcha, then press `Ctrl+Shift+I` (or `Option + Command + I` on macOS), go to "Network", then click on the `results` on the left side. Scroll down until you see "captcha_token", then replace the "captcha_token" in the `main.py` script to the one you just got.
 
+After you do that, just type 
+```py
+python main.py
+```
+and you're all good!
 
 ## How can I contribute?
 
